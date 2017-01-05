@@ -1,0 +1,25 @@
+services:
+    #Logger
+    app.service.client_logger:
+        class: ApiBundle\Service\ClientLogService
+        arguments: ["@logger"]
+        tags:
+            - { name: monolog.logger, channel: client }
+
+    app.constraint.validator.unique_field:
+        class: ApiBundle\Validator\Constraints\UniqueFieldValidator
+        arguments: ["@doctrine.orm.entity_manager"]
+        tags:
+            - { name: validator.constraint_validator, alias: validator.unique }
+
+    app.validator.base:
+        class: ApiBundle\Validator\BaseValidator
+        #abstract: true
+        calls:
+            - [setValidator, ["@validator"]]
+
+    app.validator.user:
+        class: ApiBundle\Validator\UserValidator
+        parent: app.validator.base
+        calls:
+            - [setEntityManager, ["@doctrine.orm.entity_manager"]]

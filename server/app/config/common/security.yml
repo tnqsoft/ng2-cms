@@ -1,0 +1,129 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/security.html
+security:
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
+    encoders:
+        # Our user class and the algorithm we'll use to encode passwords
+        # http://symfony.com/doc/current/book/security.html#encoding-the-user-s-password
+        ApiBundle\Entity\User: bcrypt
+
+    # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    providers:
+        database_users:
+            entity: { class: ApiBundle:User, property: username }
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js|doc)/
+            security: false
+
+        api_add_log:
+            pattern: ^/api/log/add
+            security: false
+
+        api_login:
+            pattern:  ^/api/user/login
+            stateless: true
+            anonymous: true
+            provider: database_users
+            form_login:
+                check_path: /api/user/login
+                require_previous_session: false
+                username_parameter: username
+                password_parameter: password
+                success_handler:    lexik_jwt_authentication.handler.authentication_success
+                failure_handler:    lexik_jwt_authentication.handler.authentication_failure
+            logout:
+                path: ^/api/user/logout
+                target: /
+                invalidate_session: false
+                delete_cookies:
+                    a: { path: null, domain: null }
+                    b: { path: null, domain: null }
+            remember_me:
+                secret: '%secret%'
+                lifetime: 604800 # 1 week in seconds
+                path: /
+                # by default, the feature is enabled by checking a
+                # checkbox in the login form (see below), uncomment the
+                # following line to always enable it.
+                #always_remember_me: true
+
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: database_users
+            lexik_jwt:
+                authorization_header:
+                    enabled: true
+                    prefix: Bearer
+                query_parameter:
+                    enabled: true
+                    name: bearer
+                # authentication_provider: nem_api.security.customer_jwt_provider
+                # throw_exceptions: true
+                throw_exceptions: false
+                create_entry_point: true
+
+        #main:
+            #anonymous: ~
+            # activate different ways to authenticate
+
+            # http_basic: ~
+            # http://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+
+            # form_login: ~
+            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+
+        # secured_area:
+        #     # this firewall applies to all URLs
+        #     pattern: ^/
+        #
+        #     # but the firewall does not require login on every page
+        #     # denying access is done in access_control or in your controllers
+        #     anonymous: true
+        #
+        #     # This allows the user to login by submitting a username and password
+        #     # Reference: http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+        #     form_login:
+        #         # The route name that the login form submits to
+        #         check_path: user_login
+        #         # The name of the route where the login form lives
+        #         # When the user tries to access a protected page, they are redirected here
+        #         login_path: user_login
+        #         # Secure the login form against CSRF
+        #         # Reference: http://symfony.com/doc/current/cookbook/security/csrf_in_login_form.html
+        #         csrf_token_generator: security.csrf.token_manager
+        #         use_referer: true
+        #         default_target_path: user_dashboard
+        #
+        #     logout:
+        #         # The route name the user can go to in order to logout
+        #         path: user_logout
+        #         # The name of the route to redirect to after logging out
+        #         target: user_login
+        #
+        #     remember_me:
+        #         secret:   '%secret%'
+        #         lifetime: 604800 # 1 week in seconds
+        #         path:     /
+        #         # by default, the feature is enabled by checking a
+        #         # checkbox in the login form (see below), uncomment the
+        #         # following line to always enable it.
+        #         #always_remember_me: true
+
+    access_control:
+        # this is a catch-all for the admin area
+        # additional security lives in the controllers
+        - { path: '^/api/user/login', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^/api/log/add', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: '^/api',       roles: IS_AUTHENTICATED_FULLY }
+        # - { path: '^/user/login', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # - { path: '^/user/forgot_password', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # - { path: '^/user/reset_password', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # - { path: '^/user/dashboard', roles: ROLE_USER }
+        # - { path: '^/user', roles: ROLE_ADMIN }

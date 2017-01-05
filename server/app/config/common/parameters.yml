@@ -1,0 +1,10 @@
+parameters:
+    jwt_private_key_path: "%kernel.root_dir%/../var/jwt/private.pem"
+    jwt_public_key_path: "%kernel.root_dir%/../var/jwt/public.pem"
+    jwt_key_pass_phrase: abc123
+    jwt_token_ttl: 86400
+
+    nelmio_cors_allow_origin: ['*']
+
+    logger_mail_subject: "[NG2-CMS-API][PROD] Lỗi hệ thống!"
+    logger_mail_receiver: [tuanquynh0508@gmail.com]

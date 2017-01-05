@@ -1,0 +1,24 @@
+<div class="login-wrapper">
+  <h5 class="center">Đăng nhập hệ thống</h5>
+  <div class="card-panel">
+    <form autocomplete="off" name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="last_name" type="text" class="validate" autocomplete="off">
+          <label for="last_name">Tài khoản</label>
+        </div>
+        <div class="input-field col s12">
+          <input id="last_name" type="password" class="validate" autocomplete="new-password">
+          <label for="last_name">Mật khẩu</label>
+        </div>
+        <div class="col s12 p-b-15">
+          <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" />
+          <label for="filled-in-box">Ghi nhớ đăng nhập</label>
+        </div>
+        <div class="col s12">
+          <button class="btn waves-effect waves-light col s12" type="submit">Đăng nhập</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

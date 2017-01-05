@@ -1,0 +1,11 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+
+api_login_check:
+    path: /api/login
+
+api:
+    type:     rest
+    resource: "@ApiBundle/Resources/config/routing.yml"
+    prefix:   /api

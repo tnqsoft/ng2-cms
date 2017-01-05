@@ -1,0 +1,7 @@
+imports:
+    - { resource: ../dev/config.yml }
+    - { resource: parameters.yml }
+
+swiftmailer:
+    disable_delivery: true
+    delivery_address: tuanquynh0508@gmail.com

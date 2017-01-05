@@ -1,0 +1,10 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: 127.0.0.1
+    database_port: null
+    database_name: ng2cms
+    database_user: root
+    database_password: 123456
+
+    logger_mail_subject: "[NG2-CMS-API][TEST] Lỗi hệ thống!"
+    logger_mail_receiver: [tuanquynh0508@gmail.com]

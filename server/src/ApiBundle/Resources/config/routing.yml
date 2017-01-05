@@ -1,0 +1,11 @@
+log_api:
+    resource: "@ApiBundle/Controller/LogController.php"
+    type: rest
+    prefix: /log
+    defaults: {_format: ~ }
+
+user_api:
+    resource: "@ApiBundle/Controller/UserController.php"
+    type: rest
+    prefix: /user
+    defaults: {_format: ~ }

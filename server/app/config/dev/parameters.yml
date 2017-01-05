@@ -1,0 +1,3 @@
+parameters:
+    logger_mail_subject: "[NG2-CMS-API][DEV] Lỗi hệ thống!"
+    logger_mail_receiver: [tuanquynh0508@gmail.com]

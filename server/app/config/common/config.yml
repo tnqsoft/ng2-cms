@@ -1,0 +1,186 @@
+imports:
+    - { resource: ../parameters.yml }
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    locale: en
+
+framework:
+    #esi:             ~
+    translator:      { fallbacks: ["%locale%"] }
+    secret:          "%secret%"
+    router:
+        resource: "%kernel.root_dir%/config/common/routing.yml"
+        strict_requirements: ~
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    serializer:      { enable_annotations: true }
+    templating:
+        engines: ['twig']
+    default_locale:  "%locale%"
+    trusted_hosts:   ~
+    trusted_proxies: ~
+    session:
+        # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
+        handler_id:  session.handler.native_file
+        save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
+    fragments:       ~
+    http_method_override: true
+    assets: ~
+    php_errors:
+        log: true
+
+# Twig Configuration
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    exception_controller: 'FOS\RestBundle\Controller\ExceptionController::showAction'
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_mysql
+        host:     "%database_host%"
+        port:     "%database_port%"
+        dbname:   "%database_name%"
+        user:     "%database_user%"
+        password: "%database_password%"
+        charset:  UTF8
+        # if using pdo_sqlite as your database driver:
+        #   1. add the path in parameters.yml
+        #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
+        #   2. Uncomment database_path in parameters.yml.dist
+        #   3. Uncomment next line:
+        #     path:     "%database_path%"
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: "%mailer_transport%"
+    host:      "%mailer_host%"
+    username:  "%mailer_user%"
+    password:  "%mailer_password%"
+    spool:     { type: memory }
+
+# DoctrineMigrationsBundle
+doctrine_migrations:
+    dir_name: "%kernel.root_dir%/DoctrineMigrations"
+    namespace: Application\Migrations
+    table_name: migration_versions
+    name: Application Migrations
+
+lexik_jwt_authentication:
+    private_key_path: '%jwt_private_key_path%'
+    public_key_path:  '%jwt_public_key_path%'
+    pass_phrase:      '%jwt_key_pass_phrase%'
+    token_ttl:        '%jwt_token_ttl%'
+
+nelmio_cors:
+    paths:
+        '^/api':
+            allow_origin: %nelmio_cors_allow_origin%
+            allow_headers: ['*']
+            expose_headers:
+                - 'Data-Limit'
+                - 'Data-Total-Record'
+                - 'Data-Total-Page'
+                - 'Data-Page-Current'
+                - 'Data-Page-Next'
+                - 'Data-Page-Previous'
+                - 'Data-Record-End'
+                - 'Data-Record-Start'
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
+            max_age: 3600
+
+# FOS Rest Bundle
+fos_rest:
+    serializer:
+        serialize_null: true
+    disable_csrf_role: ROLE_USER
+    param_fetcher_listener: true
+    view:
+        view_response_listener: 'force'
+        formats:
+            xml:  true
+            json: true
+            xlsx: true
+            pdf:  true
+        templating_formats:
+            html: true
+            pdf: false
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+            xml: ~
+    param_fetcher_listener: force
+    allowed_methods_listener: true
+    access_denied_listener:
+        json: true
+    format_listener:
+        rules:
+            - { path: ^/, priorities: [ json, html, xml, xlsx, pdf ], fallback_format: json, prefer_extension: true }
+    routing_loader:
+        default_format: json
+        include_format: false
+    exception:
+        codes:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
+            'Doctrine\ORM\OptimisticLockException': HTTP_CONFLICT
+        messages:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': true
+
+#LOG Config
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      grouped
+            level:        debug
+            channels: [!event, !client]
+        console:
+            type:   console
+            channels: [!event, !doctrine]
+        client:
+            type:         rotating_file
+            max_files:    5
+            path:         "%kernel.logs_dir%/client-%kernel.environment%.log"
+            # log all messages (since debug is the lowest level)
+            level:        debug
+            formatter:    log_format
+            channels:     [client]
+        grouped:
+            type:         group
+            members:      [streamed, buffered]
+        streamed:
+            type:         rotating_file
+            max_files:    5
+            path:         "%kernel.logs_dir%/%kernel.environment%.log"
+            level:        error
+            formatter:    log_format
+        buffered:
+            type:         buffer
+            handler:      swift
+        swift:
+            type:         swift_mailer
+            from_email:   %mailer_noreply%
+            to_email:     %logger_mail_receiver%
+            subject:      %logger_mail_subject%
+            level:        critical
+        # uncomment to get logging in your browser
+        # you may have to allow bigger header sizes in your Web server configuration
+        #firephp:
+        #    type:   firephp
+        #    level:  info
+        #chromephp:
+        #    type:   chromephp
+        #    level:  info
