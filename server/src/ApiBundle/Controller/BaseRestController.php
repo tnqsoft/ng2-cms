@@ -35,9 +35,11 @@ abstract class BaseRestController extends FOSRestController
      * Get and Validate Input Data.
      *
      * @param Request $request
+     * @param string $functionName
+     * @param mixed $currentObject
      * @return array
      */
-    abstract public function getAndValidateInputData(Request $request);
+    abstract public function getValidator(Request $request, $functionName, $currentObject);
 
     /**
      * Get Response For List
@@ -71,7 +73,7 @@ abstract class BaseRestController extends FOSRestController
      */
     public function getRepository($class)
     {
-        $em = $this->getDoctrine()->getManager();        
+        $em = $this->getDoctrine()->getManager();
 
         return $em->getRepository($class);
     }
@@ -86,12 +88,39 @@ abstract class BaseRestController extends FOSRestController
      */
     public function getRecordById($class, $id)
     {
-        $repository = $this->getRepository($class);        
+        $repository = $this->getRepository($class);
         $record = $repository->findOneById($id);
         if (null === $record) {
             throw new HttpException(404, 'Không tìm thấy bản ghi '.$class.' có id là '.$id);
         }
 
         return $record;
+    }
+
+    /**
+     * Get Array Value By Path
+     *
+     * @param  string $path Example: key1.key2.key3...keyn
+     * @param  array  $array
+     * @return mixed
+     */
+    public function getArrayValue($path, array $array = array(), $default = null, $delimiter = '.')
+    {
+        $keysName = explode($delimiter, $path);
+        $value = $array;
+
+        if (empty($array)) {
+            return $default;
+        }
+
+        foreach ($keysName as $key) {
+            if (isset($value[$key])) {
+                $value = $value[$key];
+            } else {
+                return $default;
+            }
+        }
+
+        return $value;
     }
 }

@@ -1,6 +1,6 @@
 /*
-SQLyog Ultimate v12.09 (64 bit)
-MySQL - 5.6.21 : Database - ng2cms
+SQLyog Ultimate v11.11 (64 bit)
+MySQL - 5.7.16-0ubuntu0.16.04.1 : Database - ng2cms
 *********************************************************************
 */
 
@@ -43,14 +43,15 @@ CREATE TABLE `user` (
   `is_active` tinyint(1) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `roles` longtext COLLATE utf8_unicode_ci NOT NULL COMMENT '(DC2Type:json_array)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_8D93D649F85E0677` (`username`),
   UNIQUE KEY `UNIQ_8D93D649E7927C74` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 /*Data for the table `user` */
 
-insert  into `user`(`id`,`username`,`email`,`password`,`reset_token`,`reset_timeout`,`is_active`,`created_at`,`updated_at`) values (1,'customer','customer@tnqsoft.com','$2y$13$IXHgbMo2QwzdMLfMkeCRFOLldJbrJJif8xB2KohdFbYbC01PnFfs2',NULL,NULL,1,'2017-01-05 18:18:50',NULL),(2,'admin','admin@tnqsoft.com','$2y$13$EBaqyunABnf76Q55DW8.t.MDJFwWID.T0xbbfzh/3B4Yu3zvRUz.2',NULL,NULL,1,'2017-01-05 18:18:51',NULL);
+insert  into `user`(`id`,`username`,`email`,`password`,`reset_token`,`reset_timeout`,`is_active`,`created_at`,`updated_at`,`roles`) values (1,'customer','customer@tnqsoft.com','$2y$13$X5hdan/8sMmpNCEmuB/jRupJmhVYgKCQOchJDIMhw01yVzYr5wU9G',NULL,NULL,1,'2017-01-06 11:55:38',NULL,'[\"ROLE_USER\"]'),(2,'admin','admin@tnqsoft.com','$2y$13$Q67dKiF6eRrGvwMJ9bJDQut1zMK/YjgjwpJqkUmL4/1Df8GahPLRq',NULL,NULL,1,'2017-01-06 11:55:38',NULL,'[\"ROLE_SUPER_ADMIN\"]');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

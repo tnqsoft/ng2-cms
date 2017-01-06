@@ -23,3 +23,7 @@ services:
         parent: app.validator.base
         calls:
             - [setEntityManager, ["@doctrine.orm.entity_manager"]]
+
+    app.validator.log:
+        class: ApiBundle\Validator\LogValidator
+        parent: app.validator.base

@@ -21,20 +21,20 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 /**
  * LogController
  */
-class LogController extends FOSRestController
+class LogController extends BaseRestController
 {
     /**
      * Write Log
      *
      * @Post("/add")
-     *
+     * @View(statusCode=204)
      * @ApiDoc(
      *  description="Write Log",
      *  section="Logger",
      *  parameters={
      *      {"name"="code", "dataType"="string", "required"=true, "description"="Exception code"},
      *      {"name"="message", "dataType"="string", "required"=true, "description"="Exception message"},
-     *      {"name"="context", "dataType"="string", "required"=true, "description"="Exception context"}
+     *      {"name"="context", "dataType"="array", "required"=true, "description"="Exception context"}
      *  },
      *  statusCodes={
      *    200="Returned when successful",
@@ -47,14 +47,41 @@ class LogController extends FOSRestController
      */
     public function writeLogAction(Request $request)
     {
+        $arguments = $this->getValidator($request, 'addLogValidate');
+        $logger = $this->get('app.service.client_logger');
+        $logger->log($arguments['code'], $arguments['message'], $arguments['context']);
+    }
+
+    public function tranformRecord($record)
+    {
+        // Nothing Todo
+    }
+
+    /**
+     * Get and Validate Input Data.
+     *
+     * @param Request $request
+     * @param string $functionName
+     * @param User $currentObject
+     * @return array
+     */
+    public function getValidator(Request $request, $functionName, $currentObject=null)
+    {
+        //Get Input Data
         $arguments = json_decode($request->getContent(), true);
         if (null === $arguments) {
             $arguments = array();
         }
 
-        $logger = $this->get('app.service.client_logger');
-        $logger->log($arguments['code'], $arguments['message'], json_decode($arguments['context'], true));
+        //Validate Input Data
+        $validator = $this->get('app.validator.log');
 
-        return null;
+        if (false === call_user_func_array(array($validator, $functionName), array($arguments))) {
+            throw new HttpException(400, json_encode($validator->getErrorList()));
+        }
+
+        $arguments['context'] = $this->getArrayValue('context', $arguments, array());
+
+        return $arguments;
     }
 }

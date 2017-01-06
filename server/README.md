@@ -111,15 +111,15 @@ tail -f -n 100 /var/log/apache2/error-ng2-cms.log
 
 php bin/console
 
-php bin/console cache:clear --env=dev
+php bin/console cache:clear --env=dev_tuan
 
 php bin/console assets:install --symlink web
 
-php bin/console assetic:dump --env=dev
+php bin/console assetic:dump --env=dev_tuan
 
-php bin/console doctrine:migrations:diff --env=dev
+php bin/console doctrine:migrations:diff --env=dev_tuan
 
-php bin/console doctrine:migrations:migrate 20160923141633 --env=dev
+php bin/console doctrine:migrations:migrate 20160923141633 --env=dev_tuan
 
 php bin/console generate:bundle --namespace=ApiBundle --dir=src --format=annotation --no-interaction
 

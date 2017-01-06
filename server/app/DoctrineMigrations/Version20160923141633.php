@@ -30,6 +30,10 @@ class Version20160923141633 extends AbstractMigration implements ContainerAwareI
         ),
     );
 
+    private $rolesAdmin = array('ROLE_SUPER_ADMIN');
+
+    private $rolesUser = array('ROLE_USER');
+
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -52,6 +56,7 @@ class Version20160923141633 extends AbstractMigration implements ContainerAwareI
         $encodedPassword = $encoder->encodePassword($user, $this->users['user']['password']);
         $user->setPassword($encodedPassword);
         $user->setResetToken(null);
+        $user->setRoles($this->rolesUser);
         $em->persist($user);
 
         $admin = new User();
@@ -60,6 +65,7 @@ class Version20160923141633 extends AbstractMigration implements ContainerAwareI
         $encodedPassword = $encoder->encodePassword($admin, $this->users['admin']['password']);
         $admin->setPassword($encodedPassword);
         $admin->setResetToken(null);
+        $admin->setRoles($this->rolesAdmin);
         $em->persist($admin);
 
         $em->flush();

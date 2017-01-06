@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use ApiBundle\Entity\User;
 
@@ -61,6 +62,7 @@ class UserController extends BaseRestController
      * Logout.
      *
      * @Post("/logout")
+     * @View(statusCode=204)
      * @Security("has_role('ROLE_USER')")
      * @ApiDoc(
      *  description="Logout",
@@ -83,6 +85,7 @@ class UserController extends BaseRestController
      * User change password.
      *
      * @Put("/change_password")
+     * @View(statusCode=204)
      * @Security("has_role('ROLE_USER')")
      * @ApiDoc(
      *  description="User change password",
@@ -102,16 +105,7 @@ class UserController extends BaseRestController
      */
     public function changePasswordAction(Request $request)
     {
-        $arguments = json_decode($request->getContent(), true);
-        if (null === $arguments) {
-            $arguments = array();
-        }
-
-        $validator = $this->get('app.validator.user');
-        if (false === $validator->changePasswordValidate($arguments)) {
-            throw new HttpException(400, json_encode($validator->getErrorList()));
-        }
-
+        $arguments = $this->getValidator($request, 'changePasswordValidate', new User());
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $passwordEncoder = $this->get('security.password_encoder');
@@ -119,8 +113,30 @@ class UserController extends BaseRestController
         $user->setPassword($password);
         $em->persist($user);
         $em->flush();
+    }
 
-        return;
+    /**
+     * User change password.
+     *
+     * @Get("/me")
+     * @Security("has_role('ROLE_USER')")
+     * @ApiDoc(
+     *  description="Get Current User",
+     *  section="User",
+     *  parameters={
+     *  },
+     *  statusCodes={
+     *    200="Returned when successful",
+     *    401="Returned when not have token or token expired",
+     *    400="Returned if not validated",
+     *  }
+     * )
+     *
+     * @return array
+     */
+    public function getCurrentUserAction(Request $request)
+    {
+        return $this->getUser();
     }
 
     //CRUD API------------------------------------------------------------------------------
@@ -173,15 +189,17 @@ class UserController extends BaseRestController
      * Add User.
      *
      * @Post("")
+     * @View(statusCode=204)
      * @Security("has_role('ROLE_SUPER_ADMIN') or has_role('ROLE_USER_ADD')")
      * @ApiDoc(
      *  description="Add User",
      *  section="User",
      *  parameters={
-     *      {"name"="title", "dataType"="string", "required"=true, "description"="Title"},
-     *      {"name"="description", "dataType"="string", "required"=true, "description"="Description"},
+     *      {"name"="username", "dataType"="string", "required"=true, "description"="Title"},
+     *      {"name"="password", "dataType"="string", "required"=false, "description"="Password"},
+     *      {"name"="email", "dataType"="string", "required"=true, "description"="Description"},
      *      {"name"="isActive", "dataType"="boolean", "required"=true, "description"="Active"},
-     *      {"name"="role", "dataType"="textarea", "required"=true, "description"="List Roles"}
+     *      {"name"="roles", "dataType"="array", "required"=true, "description"="List Roles"}
      *  },
      *  statusCodes={
      *    201="Returned when create successful",
@@ -199,24 +217,22 @@ class UserController extends BaseRestController
      */
     public function createUserAction(Request $request)
     {
-        //Get and Validate Input Data
-        $arguments = $this->getAndValidateInputData($request);
-        //Insert Database
+        // Create Object
         $record = new User();
+        //Get and Validate Input Data
+        $arguments = $this->getValidator($request, 'addAndUpdateValidate', $record);
+        //Insert Database
         $record->setUsername($arguments['username']);
         $record->setEmail($arguments['email']);
         $record->setIsActive($arguments['isActive']);
         $passwordEncoder = $this->get('security.password_encoder');
         $password = $passwordEncoder->encodePassword($record, $arguments['password']);
         $record->setPassword($password);
+        $record->setRoles($arguments['roles']);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($record);
         $em->flush();
-
-        $response = new Response(null, Response::HTTP_CREATED);
-
-        return $response;
     }
 
     /**
@@ -277,7 +293,7 @@ class UserController extends BaseRestController
      *      {"name"="password", "dataType"="string", "required"=false, "description"="Password"},
      *      {"name"="email", "dataType"="string", "required"=true, "description"="Description"},
      *      {"name"="isActive", "dataType"="boolean", "required"=true, "description"="Active"},
-     *      {"name"="groupId", "dataType"="integer", "required"=true, "description"="Group Id"}
+     *      {"name"="roles", "dataType"="array", "required"=true, "description"="List Roles"}
      *  },
      *  statusCodes={
      *    204="Returned when update successful",
@@ -296,13 +312,15 @@ class UserController extends BaseRestController
      */
     public function updateUserAction(Request $request, $id)
     {
-        //Get and Validate Input Data
-        $arguments = $this->getAndValidateInputData($request);
-        //Insert Database
+        //Get Current Object
         $record = $this->getRecordById(User::class, $id);
+        //Get and Validate Input Data
+        $arguments = $this->getValidator($request, 'addAndUpdateValidate', $record);
+        //Insert Database
         $record->setUsername($arguments['username']);
         $record->setEmail($arguments['email']);
         $record->setIsActive($arguments['isActive']);
+        $record->setRoles($arguments['roles']);
 
         if (!empty($arguments['password'])) {
             $passwordEncoder = $this->get('security.password_encoder');
@@ -323,6 +341,7 @@ class UserController extends BaseRestController
      * Delete A User.
      *
      * @Delete("/{id}", requirements={"id" = "\d+"})
+     * @View(statusCode=204)
      * @Security("has_role('ROLE_SUPER_ADMIN') or has_role('ROLE_USER_DELETE')")
      * @ApiDoc(
      *  description="Delete User",
@@ -355,10 +374,6 @@ class UserController extends BaseRestController
         $em = $this->getDoctrine()->getManager();
         $em->remove($record);
         $em->flush();
-
-        $response = new Response('Xóa thành công bản ghi có id là '.$id, Response::HTTP_NO_CONTENT);
-
-        return $response;
     }
 
     /**
@@ -375,11 +390,6 @@ class UserController extends BaseRestController
             'username' => $record->getUsername(),
             'email' => $record->getEmail(),
             'roles' => $record->getRoles(),
-            'group' => array(
-                'id' => $record->getGroup()->getId(),
-                'title' => $record->getGroup()->getTitle(),
-                'description' => $record->getGroup()->getDescription(),
-            ),
             'isActive' => $record->getIsActive(),
             'createdAt' => ($record->getCreatedAt() !== null) ? $record->getCreatedAt()->format('Y-m-d\TH:i:s') : null,
             'updatedAt' => ($record->getUpdatedAt() !== null) ? $record->getUpdatedAt()->format('Y-m-d\TH:i:s') : null,
@@ -390,19 +400,24 @@ class UserController extends BaseRestController
      * Get and Validate Input Data.
      *
      * @param Request $request
-     *
+     * @param string $functionName
+     * @param User $currentObject
      * @return array
      */
-    public function getAndValidateInputData(Request $request)
+    public function getValidator(Request $request, $functionName, $currentObject)
     {
         //Get Input Data
         $arguments = json_decode($request->getContent(), true);
         if (null === $arguments) {
             $arguments = array();
         }
+
+        $arguments['isActive'] = filter_var($this->getArrayValue('isActive', $arguments), FILTER_VALIDATE_BOOLEAN);
+
         //Validate Input Data
         $validator = $this->get('app.validator.user');
-        if (false === $validator->addAndUpdateValidate($arguments)) {
+        $validator->setCurrentObject($currentObject);
+        if (false === call_user_func_array(array($validator, $functionName), array($arguments))) {
             throw new HttpException(400, json_encode($validator->getErrorList()));
         }
 

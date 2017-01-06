@@ -4,11 +4,14 @@ namespace ApiBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 
 /**
  * @ORM\Entity(repositoryClass="ApiBundle\Repository\UserRepository")
  * @ORM\Table(name="user")
  * @ORM\HasLifecycleCallbacks()
+ * @ExclusionPolicy("all")
  *
  * Defines the properties of the User entity to represent the application users.
  * See http://symfony.com/doc/current/book/doctrine.html#creating-an-entity-class
@@ -28,16 +31,19 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Expose
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", unique=true)
+     * @Expose
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", unique=true)
+     * @Expose
      */
     private $email;
 
@@ -48,16 +54,19 @@ class User implements AdvancedUserInterface, \Serializable
 
     /**
      * @ORM\Column(name="reset_token", type="string", nullable=true)
+     * @Expose
      */
     private $resetToken;
 
     /**
      * @ORM\Column(name="reset_timeout", type="datetime", nullable=true)
+     * @Expose
      */
     private $resetTimeout;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
+     * @Expose
      */
     private $isActive;
 
@@ -65,6 +74,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     * @Expose
      */
     private $createdAt;
 
@@ -72,8 +82,17 @@ class User implements AdvancedUserInterface, \Serializable
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+     * @Expose
      */
     private $updatedAt;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="roles", type="json_array")
+     * @Expose
+     */
+    private $roles;
 
     public function __construct()
     {
@@ -123,13 +142,32 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles)
+    {
+        return $this->roles = $roles;
+    }
+
+    public function addRoles($role)
+    {
+        if(!$this->hasRole($role)) {
+            $this->roles[] = $role;
+        }
+    }
+
+    public function removeRoles($role)
+    {
+        if($this->hasRole($role)) {
+            array_splice($this->roles, array_search($role, $this->roles), 1);
+        }
     }
 
     public function hasRole($role) {
-//        $role = strtoupper($role);
-//        $roles = $this->getRoles();
-//        return in_array($role, $roles, true);
+       $role = strtoupper($role);
+       $roles = $this->getRoles();
+       return in_array($role, $roles, true);
     }
 
     /**
