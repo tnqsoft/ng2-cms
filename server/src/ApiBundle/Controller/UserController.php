@@ -273,12 +273,12 @@ class UserController extends BaseRestController
     }
 
     /**
-     * Update A User Group.
+     * Update A User.
      *
      * @Put("/{id}", requirements={"id" = "\d+"})
      * @Security("has_role('ROLE_SUPER_ADMIN') or has_role('ROLE_USERGROUP_EDIT')")
      * @ApiDoc(
-     *  description="Update User Group",
+     *  description="Update User",
      *  section="User",
      *  requirements={
      *      {
