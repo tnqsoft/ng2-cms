@@ -3,21 +3,24 @@
   <div class="card-panel">
     <form autocomplete="off" name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
       <div class="row">
-        <div class="input-field col s12">
-          <input id="last_name" type="text" class="validate" autocomplete="off">
+        <div class="input-field col s12 error">
+          <input id="last_name" type="text" class="validate" [ngClass]="{ 'invalid': f.submitted && !username.valid }" name="username" [(ngModel)]="model.username" #username="ngModel" autocomplete="off" required>
           <label for="last_name">Tài khoản</label>
+          <div class="helper-block error" *ngIf="f.submitted && !username.valid">Cần nhập tài khoản</div>
         </div>
         <div class="input-field col s12">
-          <input id="last_name" type="password" class="validate" autocomplete="new-password">
+          <input id="last_name" type="password" class="validate" [ngClass]="{ 'invalid': f.submitted && !password.valid }" name="password" [(ngModel)]="model.password" #password="ngModel" autocomplete="new-password" required>
           <label for="last_name">Mật khẩu</label>
+          <div class="helper-block error" *ngIf="f.submitted && !password.valid">Cần nhập mật khẩu</div>
         </div>
         <div class="col s12 p-b-15">
-          <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" />
+          <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" name="remember" [(ngModel)]="model.remember" #remember="ngModel"/>
           <label for="filled-in-box">Ghi nhớ đăng nhập</label>
         </div>
         <div class="col s12">
-          <button class="btn waves-effect waves-light col s12" type="submit">Đăng nhập</button>
+          <button class="btn waves-effect waves-light col s12" type="submit" [disabled]="loading">Đăng nhập</button>
         </div>
+        <div class="helper-block error center" *ngIf="error">{{error}}</div>
       </div>
     </form>
   </div>

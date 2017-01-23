@@ -7,3 +7,31 @@
 .v-m {
     vertical-align: middle;
 }
+
+input:not([type]),
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=url],
+input[type=time],
+input[type=date],
+input[type=datetime],
+input[type=datetime-local],
+input[type=tel],
+input[type=number],
+input[type=search],
+textarea.materialize-textarea {
+    margin-bottom: 5px;
+}
+
+.input-field {
+    margin-bottom: 15px;
+}
+
+.helper-block {
+    color: #999;
+    font-size: 12px;
+}
+.helper-block.error {
+    color: #F44336;
+}
