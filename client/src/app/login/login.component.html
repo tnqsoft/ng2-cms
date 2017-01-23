@@ -13,7 +13,7 @@
           <label for="last_name">Mật khẩu</label>
           <div class="helper-block error" *ngIf="f.submitted && !password.valid">Cần nhập mật khẩu</div>
         </div>
-        <div class="col s12 p-b-15">
+        <div class="col s12 p-b-15 center">
           <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" name="remember" [(ngModel)]="model.remember" #remember="ngModel"/>
           <label for="filled-in-box">Ghi nhớ đăng nhập</label>
         </div>
