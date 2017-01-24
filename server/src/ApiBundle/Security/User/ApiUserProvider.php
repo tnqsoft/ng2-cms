@@ -37,7 +37,7 @@ class ApiUserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         $repository = $this->entityManager->getRepository(User::class);
-        $user = $repository->findOneBy(array('username'=>$username));
+        $user = $repository->loginCheck($username);
 
         if (empty($user)) {
             throw new UsernameNotFoundException('Could not find user. Sorry!');

@@ -72,6 +72,9 @@ class ApiAuthenticator implements SimpleFormAuthenticatorInterface
 
     public function createToken(Request $request, $username, $password, $providerKey)
     {
+        if (trim($username) === '' && trim($password) === '') {
+            throw new HttpException(400, $this->translator->trans('Account and Password are required', array(), 'messages'));
+        }
         return new UsernamePasswordToken($username, $password, $providerKey);
     }
 }

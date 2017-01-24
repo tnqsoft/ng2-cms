@@ -18,7 +18,7 @@ class LocaleListener implements EventSubscriberInterface
      *
      * @param string $defaultLocale
      */
-    public function __construct($defaultLocale = 'vi')
+    public function __construct($defaultLocale)
     {
         $this->defaultLocale = $defaultLocale;
     }
@@ -32,7 +32,14 @@ class LocaleListener implements EventSubscriberInterface
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $locale = $request->headers->get('Accept-Language', $this->defaultLocale);
+        if (null !== $request->attributes->get('_locale')) {
+            $locale = $request->attributes->get('_locale');
+        } elseif (null !== $request->headers->get('Accept-Language')) {
+            $locale = $request->headers->get('Accept-Language');
+        } else {
+            $locale = $this->defaultLocale;
+        }
+
         $request->setLocale($locale);
     }
 

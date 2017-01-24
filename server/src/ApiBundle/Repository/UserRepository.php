@@ -82,4 +82,20 @@ class UserRepository extends EntityRepository implements UserLoaderInterface
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Login Check
+     *
+     * @param  string $username
+     * @return User
+     */
+    public function loginCheck($username)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username = :username OR u.email = :email')
+            ->setParameter('username', $username)
+            ->setParameter('email', $username)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
