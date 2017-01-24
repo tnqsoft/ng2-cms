@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://ng2-cms-api.local/',
+  apiUrl: 'http://ng2-cms-api.local/api/',
 };

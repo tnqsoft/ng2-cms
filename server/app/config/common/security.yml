@@ -13,7 +13,9 @@ security:
     # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
     providers:
         database_users:
-            entity: { class: ApiBundle:User, property: username }
+            entity: { class: ApiBundle:User }
+        api_provider:
+            id: app.security.api_user_provider
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -29,8 +31,9 @@ security:
             pattern:  ^/api/user/login
             stateless: true
             anonymous: true
-            provider: database_users
-            form_login:
+            provider: api_provider
+            simple_form:
+                authenticator: app.security.api_authenticator
                 check_path: /api/user/login
                 require_previous_session: false
                 username_parameter: username
@@ -56,7 +59,7 @@ security:
         api:
             pattern: ^/api
             stateless: true
-            provider: database_users
+            provider: api_provider
             lexik_jwt:
                 authorization_header:
                     enabled: true

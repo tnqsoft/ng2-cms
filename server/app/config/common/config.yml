@@ -7,7 +7,7 @@ imports:
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: en
+    locale: vi
 
 framework:
     #esi:             ~
@@ -108,7 +108,7 @@ fos_rest:
     disable_csrf_role: ROLE_USER
     param_fetcher_listener: true
     view:
-        view_response_listener: 'force'
+        view_response_listener: force
         formats:
             xml:  true
             json: true
@@ -132,11 +132,16 @@ fos_rest:
         default_format: json
         include_format: false
     exception:
+        enabled: true
         codes:
             'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
             'Doctrine\ORM\OptimisticLockException': HTTP_CONFLICT
         messages:
             'Symfony\Component\Routing\Exception\ResourceNotFoundException': true
+            'Symfony\Component\HttpKernel\Exception\BadRequestHttpException': true
+            'Symfony\Component\HttpKernel\Exception\HttpException': true
+            'Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException': true
+            'Symfony\Component\Security\Core\Exception\AuthenticationException': true
 
 #LOG Config
 monolog:

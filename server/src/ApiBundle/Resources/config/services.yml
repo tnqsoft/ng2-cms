@@ -6,6 +6,7 @@ services:
         tags:
             - { name: monolog.logger, channel: client }
 
+    #Validate
     app.constraint.validator.unique_field:
         class: ApiBundle\Validator\Constraints\UniqueFieldValidator
         arguments: ["@doctrine.orm.entity_manager"]
@@ -27,3 +28,19 @@ services:
     app.validator.log:
         class: ApiBundle\Validator\LogValidator
         parent: app.validator.base
+
+    #Security
+    app.security.api_user_provider:
+        class: ApiBundle\Security\User\ApiUserProvider
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    app.security.api_authenticator:
+        class:     ApiBundle\Security\ApiAuthenticator
+        arguments: ["@security.password_encoder", "@translator"]
+
+    #Event Listener
+    app.event.locale_listener:
+        class:   ApiBundle\EventListener\LocaleListener
+        arguments: ['%kernel.default_locale%']
+        tags:
+            - {name: kernel.event_subscriber}

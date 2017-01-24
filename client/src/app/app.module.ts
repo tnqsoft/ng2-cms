@@ -1,14 +1,10 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { RouterModule, Routes }  from '@angular/router';
-import { MaterializeModule } from 'angular2-materialize';
 
 import { AppComponent } from './app.component';
 import { AppRoutes } from './app.routing';
 import { LoginComponent } from './login/login.component';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -16,16 +12,11 @@ import { DashboardModule } from './dashboard/dashboard.module';
     LoginComponent
 ],
   imports: [
-    BrowserModule,
-    FormsModule,
-    HttpModule,
-    MaterializeModule,
+    SharedModule.forRoot(),
     AppRoutes,
     DashboardModule,
   ],
-  exports: [
-    RouterModule
-  ],
+  exports: [],
   providers: [],
   bootstrap: [AppComponent]
 })

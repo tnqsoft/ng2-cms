@@ -4,6 +4,8 @@ namespace ApiBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use ApiBundle\Service\PaginatorService;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
+use AppBundle\Entity\User;
 
 /**
  * This custom Doctrine repository is empty because so far we don't need any custom
@@ -12,18 +14,8 @@ use ApiBundle\Service\PaginatorService;
  * See http://symfony.com/doc/current/book/doctrine.html#custom-repository-classes
  *
  */
-class UserRepository extends EntityRepository
+class UserRepository extends EntityRepository implements UserLoaderInterface
 {
-    public function getUserByResetToken($token)
-    {
-        return $this->createQueryBuilder('u')
-            ->where('u.resetToken = :token AND u.resetTimeout > :now')
-            ->setParameter('token', $token)
-            ->setParameter('now', new \DateTime())
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
     /**
      * Get list by pagination
      *
@@ -59,5 +51,35 @@ class UserRepository extends EntityRepository
         $dql = $query->getQuery();
 
         return new PaginatorService($dql, $page, $limit);
+    }
+
+    /**
+     * Get User By Reset Token use for Reset Password check
+     *
+     * @param string $token
+     */
+    public function getUserByResetToken($token)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.resetToken = :token AND u.resetTimeout > :now')
+            ->setParameter('token', $token)
+            ->setParameter('now', new \DateTime())
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Load User By Username use for provider
+     *
+     * @param  string $username
+     * @return User
+     */
+    public function loadUserByUsername($username)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->setParameter('email', $username)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

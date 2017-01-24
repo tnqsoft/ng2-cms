@@ -1,6 +1,7 @@
 <div class="login-wrapper">
   <h5 class="center">Đăng nhập hệ thống</h5>
   <div class="card-panel">
+    <div class="card-panel red darken-3 white-text center-align" *ngIf="error && f.form.valid">{{error}}</div>
     <form autocomplete="off" name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
       <div class="row">
         <div class="input-field col s12 error">
@@ -13,14 +14,13 @@
           <label for="last_name">Mật khẩu</label>
           <div class="helper-block error" *ngIf="f.submitted && !password.valid">Cần nhập mật khẩu</div>
         </div>
-        <div class="col s12 p-b-15 center">
+        <div class="col s12 p-b-15 center-align">
           <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" name="remember" [(ngModel)]="model.remember" #remember="ngModel"/>
           <label for="filled-in-box">Ghi nhớ đăng nhập</label>
         </div>
-        <div class="col s12">
+        <div class="col s12 p-b-15">
           <button class="btn waves-effect waves-light col s12" type="submit" [disabled]="loading">Đăng nhập</button>
         </div>
-        <div class="helper-block error center" *ngIf="error">{{error}}</div>
       </div>
     </form>
   </div>
