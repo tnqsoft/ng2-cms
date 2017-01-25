@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { JwtHelper } from './jwt.helper';
 import 'rxjs/add/operator/map';
 import { environment } from '../../../environments/environment';
+import { AuthHttpService } from './auth-http.service';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
   public userid: number;
 
   constructor(
-    private http: Http,
+    private http: AuthHttpService,
     private jwtHelper: JwtHelper
   ) {
     // set token if saved in local storage
@@ -20,16 +21,11 @@ export class AuthService {
   }
 
   login(username: string, password: string, remember: boolean): Observable<boolean> {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-
     return this.http.post(environment.apiUrl+'user/login', JSON.stringify({
       username: username,
       password: password,
       remember: remember
-    }), {
-        headers: headers
-      })
+    }))
       .map((response: Response) => {
         // login successful if there's a jwt token in the response
         let token = response.json() && response.json().token;

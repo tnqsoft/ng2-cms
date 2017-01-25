@@ -44,3 +44,8 @@ services:
         arguments: ['%kernel.default_locale%']
         tags:
             - {name: kernel.event_subscriber}
+
+    app.event.exception_listener:
+        class: ApiBundle\EventListener\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }

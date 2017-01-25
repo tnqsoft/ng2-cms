@@ -11,14 +11,14 @@ import { UserService } from '../../shared/services';
 export class ChangepasswordComponent implements OnInit {
 
   private loading: boolean = false;
-  private error = '';
+  private error;
   private form: FormGroup;
 
   constructor( @Inject(FormBuilder) fb: FormBuilder, private userService: UserService) {
     this.form = fb.group({
-      oldPassword: [null, Validators.required],
-      password: [null, Validators.compose([Validators.required, Validators.minLength(6)])],
-      confirmPassword: [null, Validators.compose([Validators.required, CommonValidator.passwordMatch])],
+      oldPassword: ['123456', Validators.required],
+      password: ['123456', Validators.compose([Validators.required, Validators.minLength(6)])],
+      confirmPassword: ['123456', Validators.compose([Validators.required, CommonValidator.passwordMatch])],
     });
   }
 
@@ -35,9 +35,12 @@ export class ChangepasswordComponent implements OnInit {
 
   changePassword(data: any): void {
     this.loading = true;
+    this.error = null;
     this.userService.updatePassword(data.oldPassword, data.password)
       .subscribe(response => {
         this.loading = false;
+      }, error => {
+        this.error = JSON.parse(error.message);
       });
   }
 
