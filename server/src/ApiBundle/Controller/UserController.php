@@ -116,7 +116,7 @@ class UserController extends BaseRestController
     }
 
     /**
-     * User change password.
+     * Get Current User
      *
      * @Get("/me")
      * @Security("has_role('ROLE_USER')")
@@ -137,6 +137,37 @@ class UserController extends BaseRestController
     public function getCurrentUserAction(Request $request)
     {
         return $this->getUser();
+    }
+
+    /**
+     * Update current user
+     *
+     * @Put("/me")
+     * @View(statusCode=204)
+     * @Security("has_role('ROLE_USER')")
+     * @ApiDoc(
+     *  description="Update current user",
+     *  section="User",
+     *  parameters={
+     *      {"name"="email", "dataType"="string", "required"=true, "description"="Email"}
+     *  },
+     *  statusCodes={
+     *    200="Returned when successful",
+     *    401="Returned when not have token or token expired",
+     *    400="Returned if not validated",
+     *  }
+     * )
+     *
+     * @return array
+     */
+    public function updateCurrentUserAction(Request $request)
+    {
+        $user = $this->getUser();
+        $arguments = $this->getValidator($request, 'updateProfileValidate', $user);
+        $em = $this->getDoctrine()->getManager();
+        $user->setEmail($arguments['email']);
+        $em->persist($user);
+        $em->flush();
     }
 
     //CRUD API------------------------------------------------------------------------------
@@ -197,7 +228,7 @@ class UserController extends BaseRestController
      *  parameters={
      *      {"name"="username", "dataType"="string", "required"=true, "description"="Title"},
      *      {"name"="password", "dataType"="string", "required"=false, "description"="Password"},
-     *      {"name"="email", "dataType"="string", "required"=true, "description"="Description"},
+     *      {"name"="email", "dataType"="string", "required"=true, "description"="Email"},
      *      {"name"="isActive", "dataType"="boolean", "required"=true, "description"="Active"},
      *      {"name"="roles", "dataType"="array", "required"=true, "description"="List Roles"}
      *  },

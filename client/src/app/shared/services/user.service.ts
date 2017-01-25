@@ -1,25 +1,25 @@
-// import { Injectable } from '@angular/core';
-// import { Http, Headers, RequestOptions, Response } from '@angular/http';
-// import { Observable } from 'rxjs';
-// import 'rxjs/add/operator/map';
+import { Injectable } from '@angular/core';
+import { Http, Headers, Response } from '@angular/http';
+import { Observable } from 'rxjs';
+import 'rxjs/add/operator/map';
+import { environment } from '../../../environments/environment';
 
-// // import { AuthenticationService } from './authentication.service';
-// // import { User } from '../models';
+@Injectable()
+export class UserService {
 
-// @Injectable()
-// export class UserService {
-//     constructor(
-//         private http: Http,
-//         private authenticationService: AuthenticationService) {
-//     }
+    constructor(private http: Http) { }
 
-//     getUsers(): Observable<User[]> {
-//         // add authorization header with jwt token
-//         let headers = new Headers({ 'Authorization': 'Bearer ' + this.authenticationService.token });
-//         let options = new RequestOptions({ headers: headers });
+    updatePassword(oldPassword: string, newPassword: string): Observable<boolean> {
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
 
-//         // get users from api
-//         return this.http.get('http://localhost:3001/api/user/', options)
-//             .map((response: Response) => response.json());
-//     }
-// }
+        return this.http.put(environment.apiUrl + 'user/change_password', JSON.stringify({
+            oldPassword: oldPassword,
+            newPassword: newPassword,
+        }), {
+                headers: headers
+            })
+            .map((response: Response) => response.json());
+    }
+
+}

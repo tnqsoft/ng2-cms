@@ -34,6 +34,7 @@ class UserValidator extends BaseValidator
     /**
      * Change Password Validate.
      *
+     * @param  array $input
      * @return array
      */
     public function changePasswordValidate($input)
@@ -57,6 +58,7 @@ class UserValidator extends BaseValidator
     /**
      * Update User Validate.
      *
+     * @param  array $input
      * @return array
      */
     public function addAndUpdateValidate($input)
@@ -102,6 +104,26 @@ class UserValidator extends BaseValidator
         }
 
         $this->collections = $collections;
+
+        return $this->validate($input);
+    }
+
+    /**
+     * Update Profile Validate
+     *
+     * @param  array $input
+     * @return array
+     */
+    public function updateProfileValidate($input)
+    {
+        $this->collections = array(
+            'email' => new Constraints\Required(array(
+                new Constraints\NotBlank(array('message' => 'Không được để rỗng')),
+                new Constraints\NotNull(array('message' => 'Không được để rỗng')),
+                new Constraints\Email(array('message' => 'Sai định dạng Email')),
+                new Constraints\Callback(array($this, 'checkEmailExisted')),
+            )),
+        );
 
         return $this->validate($input);
     }

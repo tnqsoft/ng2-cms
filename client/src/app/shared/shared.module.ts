@@ -1,22 +1,23 @@
-import { NgModule, ModuleWithProviders } from '@angular/core';
+import { NgModule, ModuleWithProviders, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 import { MaterializeModule } from 'angular2-materialize';
-import { AuthGuard, AuthService, JwtHelper } from './services';
-// import { AuthenticationService, UserService } from './services';
+import { AuthGuard, AuthService, JwtHelper, UserService } from './services';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
     MaterializeModule
   ],
   exports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
     RouterModule
   ],
@@ -25,7 +26,9 @@ import { AuthGuard, AuthService, JwtHelper } from './services';
     AuthGuard,
     AuthService,
     JwtHelper,
-  ]
+    UserService,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 
 export class SharedModule {

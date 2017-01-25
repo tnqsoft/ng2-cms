@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonValidator } from '../../shared/validator/common.validator';
+import { UserService } from '../../shared/services';
 
 @Component({
   selector: 'app-changepassword',
@@ -7,9 +10,35 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ChangepasswordComponent implements OnInit {
 
-  constructor() { }
+  private loading: boolean = false;
+  private error = '';
+  private form: FormGroup;
+
+  constructor( @Inject(FormBuilder) fb: FormBuilder, private userService: UserService) {
+    this.form = fb.group({
+      oldPassword: [null, Validators.required],
+      password: [null, Validators.compose([Validators.required, Validators.minLength(6)])],
+      confirmPassword: [null, Validators.compose([Validators.required, CommonValidator.passwordMatch])],
+    });
+  }
 
   ngOnInit() {
+  }
+
+  isError(input: string): boolean {
+    return this.form.controls[input].errors && (this.form.controls[input].dirty || this.form.controls[input].touched);
+  }
+
+  hasErrorWith(input: string, error: string): boolean {
+    return this.form.controls[input].errors[error];
+  }
+
+  changePassword(data: any): void {
+    this.loading = true;
+    this.userService.updatePassword(data.oldPassword, data.password)
+      .subscribe(response => {
+        this.loading = false;
+      });
   }
 
 }
