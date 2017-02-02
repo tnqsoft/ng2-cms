@@ -1,0 +1,3 @@
+<div class="list-errors" *ngIf="getErrorField()">
+    <div class="helper-block error" [hidden]="!getErrorField()">{{ getErrorField() }}</div>
+</div>

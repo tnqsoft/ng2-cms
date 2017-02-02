@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers, Response } from '@angular/http';
 import { Observable } from 'rxjs';
-import { JwtHelper } from './jwt.helper';
+import { JwtHelper } from '../helper';
 import 'rxjs/add/operator/map';
 import { environment } from '../../../environments/environment';
 import { AuthHttpService } from './auth-http.service';
@@ -49,7 +49,8 @@ export class AuthService {
           // return false to indicate failed login
           return false;
         }
-      });
+      })
+      .catch((error: any) => Observable.throw(error.json() || 'Server error'));
   }
 
   logout(): void {

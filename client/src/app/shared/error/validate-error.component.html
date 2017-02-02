@@ -1,0 +1,3 @@
+<div class="list-errors" *ngIf="formBase.isError(field)">
+  <div class="helper-block error" [hidden]="!formBase.hasErrorWith(field, error)">{{ message }}</div>
+</div>

@@ -4,7 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 import { RouterModule, Routes, Router } from '@angular/router';
 import { MaterializeModule } from 'angular2-materialize';
-import { AuthGuard, AuthService, JwtHelper, UserService, AuthHttpService } from './services';
+import { JwtHelper } from './helper';
+import { AuthGuard, AuthService, UserService, AuthHttpService } from './services';
+import { ValidateErrorComponent, FieldErrorComponent, FormErrorComponent } from './error';
 
 @NgModule({
   imports: [
@@ -19,9 +21,16 @@ import { AuthGuard, AuthService, JwtHelper, UserService, AuthHttpService } from 
     FormsModule,
     ReactiveFormsModule,
     HttpModule,
-    RouterModule
+    RouterModule,
+    ValidateErrorComponent,
+    FieldErrorComponent,
+    FormErrorComponent
   ],
-  declarations: [],
+  declarations: [
+    ValidateErrorComponent,
+    FieldErrorComponent,
+    FormErrorComponent
+  ],
   providers: [
     AuthGuard,
     AuthService,

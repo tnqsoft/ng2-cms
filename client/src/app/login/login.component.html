@@ -1,25 +1,29 @@
 <div class="login-wrapper">
   <h5 class="center">Đăng nhập hệ thống</h5>
   <div class="card-panel hoverable">
-    <div class="card-panel red darken-3 white-text center-align" *ngIf="error && f.form.valid">{{error}}</div>
-    <form autocomplete="off" name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+
+    <app-form-error [formBase]="loginForm"></app-form-error>
+
+    <form [formGroup]="loginForm.form" (ngSubmit)="login(loginForm.form.value)" novalidate>
       <div class="row">
         <div class="input-field col s12 error">
-          <input id="last_name" type="text" class="validate" [ngClass]="{ 'invalid': f.submitted && !username.valid }" name="username" [(ngModel)]="model.username" #username="ngModel" autocomplete="off" required [disabled]="loading">
-          <label for="last_name">Tài khoản hoặc Email</label>
-          <div class="helper-block error" *ngIf="f.submitted && !username.valid">Cần nhập tài khoản hoặc Email</div>
+          <input id="username" type="text" formControlName="username" class="validate" [ngClass]="{'invalid': loginForm.isError('username')}">
+          <label for="username">Tài khoản hoặc Email <span class="red-text">*</span></label>
+          <app-validate-error [formBase]="loginForm" [field]="'username'" [error]="'required'" [message]="'Cần nhập tài khoản hoặc Email'"></app-validate-error>
+          <app-field-error [formBase]="loginForm" [field]="'username'"></app-field-error>
         </div>
         <div class="input-field col s12">
-          <input id="last_name" type="password" class="validate" [ngClass]="{ 'invalid': f.submitted && !password.valid }" name="password" [(ngModel)]="model.password" #password="ngModel" autocomplete="new-password" required [disabled]="loading">
-          <label for="last_name">Mật khẩu</label>
-          <div class="helper-block error" *ngIf="f.submitted && !password.valid">Cần nhập mật khẩu</div>
+          <input id="password" type="password" formControlName="password" class="validate" autocomplete="new-password" [ngClass]="{'invalid': loginForm.isError('password')}">
+          <label for="password">Mật khẩu <span class="red-text">*</span></label>
+          <app-validate-error [formBase]="loginForm" [field]="'password'" [error]="'required'" [message]="'Cần nhập mật khẩu'"></app-validate-error>
+          <app-field-error [formBase]="loginForm" [field]="'password'"></app-field-error>
         </div>
         <div class="col s12 p-b-15 center-align">
-          <input type="checkbox" class="filled-in" id="filled-in-box" checked="checked" name="remember" [(ngModel)]="model.remember" #remember="ngModel" [disabled]="loading"/>
+          <input type="checkbox" class="filled-in" id="filled-in-box" name="remember" formControlName="remember"/>
           <label for="filled-in-box">Ghi nhớ đăng nhập</label>
         </div>
         <div class="col s12 p-b-15 center-align">
-          <button class="btn waves-effect waves-light" type="submit" [disabled]="loading">
+          <button class="btn waves-effect waves-light" type="submit" [disabled]="!loginForm.form.valid || loading">
             <i class="material-icons left">lock_outline</i>
             Đăng nhập
           </button>

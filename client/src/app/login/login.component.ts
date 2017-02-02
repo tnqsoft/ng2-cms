@@ -1,34 +1,44 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../shared/services/auth.service';
+import { AuthService } from '../shared/services';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { LoginForm } from './login.form';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  providers: [
+    LoginForm
+  ]
 })
 export class LoginComponent implements OnInit {
 
-  private model: any = {};
   private loading: boolean = false;
-  private error = '';
 
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private loginForm: LoginForm) {
+  }
 
   ngOnInit() {
     this.authService.logout();
   }
 
-  login() {
+  login(data: any) {
     this.loading = true;
-    this.authService.login(this.model.username, this.model.password, this.model.remember)
+    this.loginForm.errors = null;
+    this.loginForm.disableControl();
+    this.authService.login(data.username, data.password, data.remember)
       .subscribe(result => {
         this.loading = false;
+        this.loginForm.enableControl();
         this.router.navigate(['/']);
-      }, err => {
-        let error = err.json();
-        this.error = error.message;
+      }, error => {
+        this.loginForm.errors = error.error;
         this.loading = false;
+        this.loginForm.enableControl();
       });
   }
 
