@@ -1,5 +1,5 @@
 # Validation message
-"Field is required": "Field is required"
+"Field is mandatory": "Field is mandatory"
 
 # Error message
 "common.error": "Error system"

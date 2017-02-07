@@ -79,6 +79,10 @@ class ApiAuthenticator implements SimpleFormAuthenticatorInterface
             $problem->setStatusCode(Response::HTTP_UNAUTHORIZED);
             $problem->setMessage($this->translator->trans(Type::AUTHENTICATION_ERROR, array(), 'messages'));
             $problem->setType(Type::AUTHENTICATION_ERROR);
+            $error = new Error();
+            $error->setItem('username');
+            $error->setMessage($this->translator->trans('Account is locked', array(), 'messages'));
+            $problem->addError($error);
             throw new AppException($problem);
         }
 
@@ -105,11 +109,11 @@ class ApiAuthenticator implements SimpleFormAuthenticatorInterface
             $problem->setType(Type::VALIDATION_ERROR);
             $error = new Error();
             $error->setItem('username');
-            $error->setMessage($this->translator->trans('Field is required', array(), 'messages'));
+            $error->setMessage($this->translator->trans('Field is mandatory', array(), 'messages'));
             $problem->addError($error);
             $error = new Error();
             $error->setItem('password');
-            $error->setMessage($this->translator->trans('Field is required', array(), 'messages'));
+            $error->setMessage($this->translator->trans('Field is mandatory', array(), 'messages'));
             $problem->addError($error);
             throw new AppException($problem);
         }

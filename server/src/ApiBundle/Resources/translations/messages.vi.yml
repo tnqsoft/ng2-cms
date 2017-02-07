@@ -1,5 +1,5 @@
 # Validation message
-"Field is required": "Cần nhập giá trị"
+"Field is mandatory": "Cần nhập giá trị"
 
 # Error message
 "common.error": "Lỗi hệ thống"
