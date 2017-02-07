@@ -5,6 +5,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+use ApiBundle\Exception\Constant\Type;
+use ApiBundle\Exception\AppException;
+
 class ExceptionListener
 {
     /**
@@ -13,23 +16,21 @@ class ExceptionListener
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $code = 500;
-        $type = '';
-
+        $code = ($exception instanceof HttpException)?$exception->getStatusCode():500;
         $message = $exception->getMessage();
-        if (json_decode($message) !== null) {
-            $message = json_decode($message);
+
+        if ($exception instanceof AppException) {
+            $responseData = $exception->__toArray();
+        } else {
+            $responseData = array(
+                'statusCode' => $code,
+                "type" => Type::COMMON_ERROR,
+                'message' => $message,
+            );
         }
 
-        if ($exception instanceof HttpException) {
-            $code = $exception->getStatusCode();
-        }
+        $response = new JsonResponse($responseData, $code);
 
-        $responseData = array(
-            'code' => $code,
-            'error' => $message
-        );
-
-        $event->setResponse(new JsonResponse($responseData, $code));
+        $event->setResponse($response);
     }
 }

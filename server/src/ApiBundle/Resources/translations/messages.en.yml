@@ -1,5 +1,14 @@
+# Validation message
+"Field is required": "Field is required"
+
+# Error message
+"common.error": "Error system"
+"authentication.error": "Authentication error"
+"authorization.error": "Authorization error"
+"validation.error": "Validation error"
+"process.error": "Processing error"
+
 "Bad credentials": "Bad credentials"
 "Account does not existed": "Account does not existed"
 "Password incorrect": "Password incorrect"
 "Account is locked": "Account is locked"
-"Account and Password are required": "Account and Password are required"

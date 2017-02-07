@@ -1,5 +1,14 @@
+# Validation message
+"Field is required": "Cần nhập giá trị"
+
+# Error message
+"common.error": "Lỗi hệ thống"
+"authentication.error": "Lỗi đăng nhập"
+"authorization.error": "Lỗi bảo mật"
+"validation.error": "Lỗi nhập liệu"
+"process.error": "Lỗi xử lý"
+
 "Bad credentials": "Đăng nhập với tài khoản hoặc mật khẩu sai"
 "Account does not existed": "Tài khoản không tồn tại"
 "Password incorrect": "Mật khẩu không đúng"
 "Account is locked": "Tài khoản đang bị khóa"
-"Account and Password are required": "Tài khoản và mật khẩu cần nhập"

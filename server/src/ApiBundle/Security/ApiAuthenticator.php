@@ -14,6 +14,12 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Symfony\Component\HttpFoundation\Response;
+use ApiBundle\Exception\Constant\Type;
+use ApiBundle\Exception\Entity\Problem;
+use ApiBundle\Exception\Entity\Error;
+use ApiBundle\Exception\AppException;
+
 class ApiAuthenticator implements SimpleFormAuthenticatorInterface
 {
     /**
@@ -40,7 +46,15 @@ class ApiAuthenticator implements SimpleFormAuthenticatorInterface
             // CAUTION: this message will be returned to the client
             // (so don't put any un-trusted messages / error strings here)
             // throw new CustomUserMessageAuthenticationException('Invalid username or password');
-            throw new HttpException(401, $this->translator->trans('Account does not existed', array(), 'messages'));
+            $problem = new Problem();
+            $problem->setStatusCode(Response::HTTP_UNAUTHORIZED);
+            $problem->setMessage($this->translator->trans(Type::AUTHENTICATION_ERROR, array(), 'messages'));
+            $problem->setType(Type::AUTHENTICATION_ERROR);
+            $error = new Error();
+            $error->setItem('username');
+            $error->setMessage($this->translator->trans('Account does not existed', array(), 'messages'));
+            $problem->addError($error);
+            throw new AppException($problem);
         }
 
         $passwordValid = $this->encoder->isPasswordValid($user, $token->getCredentials());
@@ -49,11 +63,23 @@ class ApiAuthenticator implements SimpleFormAuthenticatorInterface
             // CAUTION: this message will be returned to the client
             // (so don't put any un-trusted messages / error strings here)
             // throw new CustomUserMessageAuthenticationException('Invalid username or password');
-            throw new HttpException(401, $this->translator->trans('Password incorrect', array(), 'messages'));
+            $problem = new Problem();
+            $problem->setStatusCode(Response::HTTP_UNAUTHORIZED);
+            $problem->setMessage($this->translator->trans(Type::AUTHENTICATION_ERROR, array(), 'messages'));
+            $problem->setType(Type::AUTHENTICATION_ERROR);
+            $error = new Error();
+            $error->setItem('password');
+            $error->setMessage($this->translator->trans('Password incorrect', array(), 'messages'));
+            $problem->addError($error);
+            throw new AppException($problem);
         }
 
         if (false === $user->isEnabled()) {
-            throw new HttpException(401, $this->translator->trans('Account is locked', array(), 'messages'));
+            $problem = new Problem();
+            $problem->setStatusCode(Response::HTTP_UNAUTHORIZED);
+            $problem->setMessage($this->translator->trans(Type::AUTHENTICATION_ERROR, array(), 'messages'));
+            $problem->setType(Type::AUTHENTICATION_ERROR);
+            throw new AppException($problem);
         }
 
         return new UsernamePasswordToken(
@@ -73,7 +99,19 @@ class ApiAuthenticator implements SimpleFormAuthenticatorInterface
     public function createToken(Request $request, $username, $password, $providerKey)
     {
         if (trim($username) === '' && trim($password) === '') {
-            throw new HttpException(400, $this->translator->trans('Account and Password are required', array(), 'messages'));
+            $problem = new Problem();
+            $problem->setStatusCode(Response::HTTP_BAD_REQUEST);
+            $problem->setMessage($this->translator->trans(Type::VALIDATION_ERROR, array(), 'messages'));
+            $problem->setType(Type::VALIDATION_ERROR);
+            $error = new Error();
+            $error->setItem('username');
+            $error->setMessage($this->translator->trans('Field is required', array(), 'messages'));
+            $problem->addError($error);
+            $error = new Error();
+            $error->setItem('password');
+            $error->setMessage($this->translator->trans('Field is required', array(), 'messages'));
+            $problem->addError($error);
+            throw new AppException($problem);
         }
         return new UsernamePasswordToken($username, $password, $providerKey);
     }
